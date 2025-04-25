@@ -1,5 +1,8 @@
 {
   "devDependencies": {
     "@types/node": "^22.15.2"
+  },
+  "dependencies": {
+    "convert-array-to-csv": "^2.0.0"
   }
 }
