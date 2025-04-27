@@ -1,10 +1,11 @@
 const { convertArrayToCSV } = require("convert-array-to-csv");
-const { eachDayOfInterval, startOfMonth, endOfMonth } = require("date-fns");
 const fileSystem = require("node:fs");
+
 const StakingInfo = require("./classes.js");
+const actualBy365 = require("./functions.js");
 
 const csvFile = [];
-const cs = new StakingInfo(); // CS - Customer
+const csi = new StakingInfo(); // - Customer investment
 
 const headers = [
   "Line #",
@@ -16,48 +17,70 @@ const headers = [
 ];
 csvFile.push(headers);
 
-function calculateReward(actualDays, yearDays, rate, investment) {
-  return (actualDays / yearDays) * (rate / 100) * investment;
-}
-
+// MAIN CORE FUNCTION
 (function funcManageData() {
-  for (let i = 1; i <= cs.durationInMonths; i++) {
+  // Setting first monthGainedReward
+  csi.setMonthGainedReward(
+    actualBy365(
+      1,
+      csi.durationInMonths,
+      csi.startDate,
+      csi.rewardDate,
+      csi.paymentDay,
+      csi.rate,
+      csi.investment
+    )
+  );
+  csi.setTotalGainedReward(csi.monthGainedReward);
+
+  for (let i = 1; i <= csi.durationInMonths + 1; i++) {
     const data = [
       {
         Line: i,
 
-        Reward_Date: `${cs.startDate.getFullYear()}-${cs.startDate
-          .getMonth()
+        Reward_Date: `${csi.rewardDate.getUTCFullYear()}-${(
+          csi.rewardDate.getUTCMonth() + 1
+        )
           .toString()
-          .padStart(2, "0")}-${cs.startDate
-          .getDate()
+          .padStart(2, "0")}-${csi.rewardDate
+          .getUTCDate()
           .toString()
           .padStart(2, "0")}`,
 
-        Investment_Amount: cs.investment.toFixed(6),
+        Investment_Amount: csi.investment.toFixed(6),
 
-        Current_Month_Reward_Amount: calculateReward(
-          30,
-          365,
-          cs.rate,
-          cs.investment
-        ).toFixed(6),
+        Current_Month_Reward_Amount: csi.getMonthGainedReward().toFixed(6),
 
-        Total_Reward_Amount_To_Date: "?.??????",
+        Total_Reward_Amount_To_Date: csi.totalGainedReward.toFixed(6),
 
-        Staking_Reward_Rate: `${cs.getRate().toFixed(2)}%`,
+        Staking_Reward_Rate: `${csi.getRate().toFixed(2)}%`,
       },
     ];
     data.forEach((item) => {
       csvFile.push(Object.values(item));
     });
-    cs.setInvestment(
-      cs.investment + calculateReward(30, 365, cs.rate, cs.investment)
+
+    // ITERATIONAL UPDATES
+    csi.rewardDate.setMonth(csi.rewardDate.getUTCMonth() + 1);
+    csi.setInvestment(csi.investment + csi.monthGainedReward);
+    csi.setMonthGainedReward(
+      actualBy365(
+        i,
+        csi.durationInMonths,
+        csi.startDate,
+        csi.rewardDate,
+        csi.paymentDay,
+        csi.rate,
+        csi.investment
+      )
+    );
+    csi.setTotalGainedReward(
+      csi.getMonthGainedReward() + csi.getTotalGainedReward()
     );
   }
 })();
 
-// /////////////////////////////////////////////////////////////////////////
+// EXPORTING
 const csvFromArrayOfArrays = convertArrayToCSV(csvFile, {
   headers,
   separator: ";",
@@ -69,18 +92,3 @@ fileSystem.writeFile("output.csv", csvFromArrayOfArrays, (err) => {
   }
   console.log("CSV file saved successfully!");
 });
-// /////////////////////////////////////////////////////////////////////////
-
-// const date = new Date("2025-04-01");
-// date.setFullYear(2025);
-
-// const daysInMonth = eachDayOfInterval({
-//   start: startOfMonth(date),
-//   end: endOfMonth(date),
-// }).map((day) => {
-//   const newDay = new Date(day);
-//   newDay.setHours(3, 0, 0, 0); // GMT+3
-//   return newDay;
-// });
-// console.log(daysInMonth);
-// console.log(daysInMonth.length);
