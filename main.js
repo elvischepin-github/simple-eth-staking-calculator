@@ -17,9 +17,9 @@ const headers = [
 ];
 csvFile.push(headers);
 
-// MAIN CORE FUNCTION
+// // // MAIN CORE IIFE FUNCTION
 (function funcManageData() {
-  // Setting first monthGainedReward
+  // Initial first monthGainedReward
   csi.setMonthGainedReward(
     actualBy365(
       1,
@@ -33,11 +33,16 @@ csvFile.push(headers);
   );
   csi.setTotalGainedReward(csi.monthGainedReward);
 
+  // // ITERATIONS
   for (let i = 1; i <= csi.durationInMonths + 1; i++) {
+    // Setting last months day
+    if (i == csi.durationInMonths + 1) {
+      csi.rewardDate.setDate(csi.startDate.getUTCDate());
+    }
+
     const data = [
       {
         Line: i,
-
         Reward_Date: `${csi.rewardDate.getUTCFullYear()}-${(
           csi.rewardDate.getUTCMonth() + 1
         )
@@ -46,13 +51,9 @@ csvFile.push(headers);
           .getUTCDate()
           .toString()
           .padStart(2, "0")}`,
-
         Investment_Amount: csi.investment.toFixed(6),
-
         Current_Month_Reward_Amount: csi.getMonthGainedReward().toFixed(6),
-
-        Total_Reward_Amount_To_Date: csi.totalGainedReward.toFixed(6),
-
+        Total_Reward_Amount_To_Date: csi.getTotalGainedReward().toFixed(6),
         Staking_Reward_Rate: `${csi.getRate().toFixed(2)}%`,
       },
     ];
@@ -60,12 +61,15 @@ csvFile.push(headers);
       csvFile.push(Object.values(item));
     });
 
-    // ITERATIONAL UPDATES
+    // INCREMENTS
     csi.rewardDate.setMonth(csi.rewardDate.getUTCMonth() + 1);
+
     csi.setInvestment(csi.investment + csi.monthGainedReward);
+
+    // Calculating the next month
     csi.setMonthGainedReward(
       actualBy365(
-        i,
+        i + 1,
         csi.durationInMonths,
         csi.startDate,
         csi.rewardDate,
@@ -74,6 +78,7 @@ csvFile.push(headers);
         csi.investment
       )
     );
+
     csi.setTotalGainedReward(
       csi.getMonthGainedReward() + csi.getTotalGainedReward()
     );
@@ -86,7 +91,9 @@ const csvFromArrayOfArrays = convertArrayToCSV(csvFile, {
   separator: ";",
 });
 
-fileSystem.writeFile("output.csv", csvFromArrayOfArrays, (err) => {
+const finalExport = `sep=;\n${csvFromArrayOfArrays}`;
+
+fileSystem.writeFile("output.csv", finalExport, { encoding: "utf8" }, (err) => {
   if (err) {
     console.log("❌ Error:", err);
   }

@@ -1,5 +1,7 @@
 # Simplified Ethereum Staking Profit Calculator
 
+> All calculations done with original values, then rounded up to 6 decimal to display the results
+
 ## Instructions
 
 **Environment Setup**
