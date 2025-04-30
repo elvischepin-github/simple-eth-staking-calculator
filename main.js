@@ -29,13 +29,18 @@ csvFile.push(headers);
           csi.durationInMonths,
           csi.startDate,
           csi.rewardDate,
+          csi.rateChangeDate,
           csi.paymentDay,
           csi.rate,
-          csi.investment
+          csi.rateChange,
+          csi.investment,
+          csi.isRateChange,
+          csi
         )
       );
       csi.setTotalGainedReward(csi.monthGainedReward);
     }
+
     // Setting last months day, if start day is less or equal to than payment day
     if (
       i == csi.durationInMonths + 1 &&
@@ -58,7 +63,11 @@ csvFile.push(headers);
         Investment_Amount: csi.investment.toFixed(6),
         Current_Month_Reward_Amount: csi.getMonthGainedReward().toFixed(6),
         Total_Reward_Amount_To_Date: csi.getTotalGainedReward().toFixed(6),
-        Staking_Reward_Rate: `${csi.getRate().toFixed(2)}%`,
+        Staking_Reward_Rate: `${
+          csi.getIsChangeRateTransitionMonthCalculated()
+            ? csi.rateChange.toFixed(2)
+            : csi.getRate().toFixed(2)
+        }%`,
       },
     ];
     data.forEach((item) => {
@@ -77,9 +86,13 @@ csvFile.push(headers);
         csi.durationInMonths,
         csi.startDate,
         csi.rewardDate,
+        csi.rateChangeDate,
         csi.paymentDay,
         csi.rate,
-        csi.investment
+        csi.rateChange,
+        csi.investment,
+        csi.isRateChange,
+        csi
       )
     );
 

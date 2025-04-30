@@ -1,26 +1,24 @@
-const { eachDayOfInterval, startOfMonth, endOfMonth } = require("date-fns");
+const {
+  eachDayOfInterval,
+  startOfMonth,
+  endOfMonth,
+  compareAsc,
+} = require("date-fns");
 
 function actualBy365(
   index,
   durationInMonthsArg,
   startDateArg,
   rewardDateArg,
+  rateChangeDateArg,
   paymentDayArg,
   rateArg,
-  investmentArg
+  rateChangeArg,
+  investmentArg,
+  isRateChangeArg,
+  instanceOfClass
 ) {
   let actualDays;
-
-  // Dynamic shared current month
-  const daysInMonth = eachDayOfInterval({
-    start: startOfMonth(rewardDateArg),
-    end: endOfMonth(rewardDateArg),
-  }).map((day) => {
-    // Mapping to set whole month days to correct hours because by default first day is from previous month UTC+0
-    const newDay = new Date(day);
-    newDay.setHours(3, 0, 0, 0); // GMT+3
-    return newDay;
-  });
 
   // Dynamic shared last month
   const lastMonth = new Date(rewardDateArg);
@@ -34,6 +32,57 @@ function actualBy365(
     newDay.setHours(3, 0, 0, 0); // GMT+3
     return newDay;
   });
+
+  // RATE TRANSITION MONTH
+  // Checking if rateChange arrived (compareAsc returns 1 as True and -1 as False)
+  if (
+    !instanceOfClass.getIsChangeRateTransitionMonthCalculated() &&
+    isRateChangeArg &&
+    compareAsc(rewardDateArg, rateChangeDateArg) == 1
+  ) {
+    let firstRate, secondRate, firstRateCalc, secondRateCalc, result;
+
+    if (paymentDayArg >= rateChangeDateArg.getUTCDate()) {
+      firstRate =
+        lastDaysInMonth.length -
+        paymentDayArg +
+        rateChangeDateArg.getUTCDate() -
+        1;
+      firstRateCalc = () => {
+        return (firstRate / 365) * (rateArg / 100) * investmentArg;
+      };
+
+      secondRate = paymentDayArg - rateChangeDateArg.getUTCDate();
+      secondRateCalc = () => {
+        return (secondRate / 365) * (rateChangeArg / 100) * investmentArg;
+      };
+
+      result = firstRateCalc() + secondRateCalc();
+
+      instanceOfClass.setIsChangeRateTransitionMonthCalculated(true);
+      return result;
+    } else if (paymentDayArg < rateChangeDateArg.getUTCDate()) {
+      firstRate = rateChangeDateArg.getUTCDate() - paymentDayArg;
+
+      firstRateCalc = () => {
+        return (firstRate / 365) * (rateArg / 100) * investmentArg;
+      };
+
+      secondRate =
+        lastDaysInMonth.length -
+        rateChangeDateArg.getUTCDate() +
+        paymentDayArg -
+        1;
+      secondRateCalc = () => {
+        return (secondRate / 365) * (rateChangeArg / 100) * investmentArg;
+      };
+
+      result = firstRateCalc() + secondRateCalc();
+
+      instanceOfClass.setIsChangeRateTransitionMonthCalculated(true);
+      return result;
+    }
+  }
 
   // EXIT
   if (index > durationInMonthsArg + 1) {
@@ -70,6 +119,13 @@ function actualBy365(
     actualDays = lastDaysInMonth.length - paymentDayArg + lastDay - 1; // Not including the last day
   }
 
-  return (actualDays / 365) * (rateArg / 100) * investmentArg;
+  return (
+    (actualDays / 365) *
+    ((instanceOfClass.getIsChangeRateTransitionMonthCalculated()
+      ? rateChangeArg
+      : rateArg) /
+      100) *
+    investmentArg
+  );
 }
 module.exports = actualBy365;
