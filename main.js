@@ -19,24 +19,28 @@ csvFile.push(headers);
 
 // // // MAIN CORE IIFE FUNCTION
 (function funcManageData() {
-  // Initial first monthGainedReward
-  csi.setMonthGainedReward(
-    actualBy365(
-      1,
-      csi.durationInMonths,
-      csi.startDate,
-      csi.rewardDate,
-      csi.paymentDay,
-      csi.rate,
-      csi.investment
-    )
-  );
-  csi.setTotalGainedReward(csi.monthGainedReward);
-
   // // ITERATIONS
   for (let i = 1; i <= csi.durationInMonths + 1; i++) {
-    // Setting last months day
-    if (i == csi.durationInMonths + 1) {
+    // If first month
+    if (i === 1) {
+      csi.setMonthGainedReward(
+        actualBy365(
+          i,
+          csi.durationInMonths,
+          csi.startDate,
+          csi.rewardDate,
+          csi.paymentDay,
+          csi.rate,
+          csi.investment
+        )
+      );
+      csi.setTotalGainedReward(csi.monthGainedReward);
+    }
+    // Setting last months day, if start day is less or equal to than payment day
+    if (
+      i == csi.durationInMonths + 1 &&
+      csi.getPaymentDay() >= csi.startDate.getUTCDate()
+    ) {
       csi.rewardDate.setDate(csi.startDate.getUTCDate());
     }
 

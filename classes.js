@@ -25,7 +25,7 @@ class StakingInfo {
     this.rewardDate = new Date(this.startDate);
     if (this.rewardDate.getDate() <= this.paymentDay) {
       this.rewardDate.setDate(this.paymentDay);
-    } else {
+    } else if (this.rewardDate.getDate() > this.paymentDay) {
       this.rewardDate.setMonth(this.rewardDate.getMonth() + 1);
       this.rewardDate.setDate(this.paymentDay);
     }
