@@ -39,7 +39,7 @@ class StakingInfo {
     this.rateChangeDate = new Date();
     this.rateChangeDate.setFullYear(2026);
     this.rateChangeDate.setMonth(3);
-    this.rateChangeDate.setDate(26);
+    this.rateChangeDate.setDate(15);
     this.rateChangeDate.setHours(3, 0, 0, 0); // GMT+3
 
     this.gainedMonthlyReward = 0;
