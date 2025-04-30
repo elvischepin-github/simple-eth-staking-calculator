@@ -26,9 +26,12 @@ csvFile.push(headers);
       csi.durationInMonths,
       csi.startDate,
       csi.rewardDate,
+      csi.rateChangeDate,
       csi.paymentDay,
       csi.rate,
-      csi.investment
+      csi.rateChange,
+      csi.investment,
+      csi.isRateChange
     )
   );
   csi.setTotalGainedReward(csi.monthGainedReward);
@@ -73,15 +76,27 @@ csvFile.push(headers);
         csi.durationInMonths,
         csi.startDate,
         csi.rewardDate,
+        csi.rateChangeDate,
         csi.paymentDay,
         csi.rate,
-        csi.investment
+        csi.rateChange,
+        csi.investment,
+        csi.isRateChange
       )
     );
 
     csi.setTotalGainedReward(
       csi.getMonthGainedReward() + csi.getTotalGainedReward()
     );
+
+    // Checking if rateChange arrived
+    if (
+      csi.rewardDate.getUTCFullYear() >= csi.rateChangeDate.getUTCFullYear() &&
+      csi.rewardDate.getUTCMonth() >= csi.rateChangeDate.getUTCMonth() &&
+      csi.rewardDate.getUTCDate() >= csi.rateChangeDate.getUTCDate()
+    ) {
+      csi.setIsRateChange(true);
+    }
   }
 })();
 

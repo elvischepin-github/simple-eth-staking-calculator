@@ -1,5 +1,8 @@
 node_modules
+.vscode
+.DS_Store
 
 # Other
 main_task.*
+bonus_task_1.*
 notes.*

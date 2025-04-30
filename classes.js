@@ -1,17 +1,21 @@
 class StakingInfo {
   #investment;
   #rate;
+  #rateChange;
+  #rateChangeDate;
   #startDate;
   #durationInMonths;
   #paymentDay;
   #rewardDate;
   #monthGainedReward;
   #totalGainedReward;
+  #isRateChange;
   #isReinvesting;
 
   constructor() {
     this.investment = 25;
     this.rate = 10;
+    this.rateChange = 8;
 
     this.startDate = new Date();
     this.startDate.setFullYear(2025);
@@ -30,8 +34,15 @@ class StakingInfo {
       this.rewardDate.setDate(this.paymentDay);
     }
 
+    this.rateChangeDate = new Date();
+    this.rateChangeDate.setFullYear(2026);
+    this.rateChangeDate.setMonth(3);
+    this.rateChangeDate.setDate(15);
+    this.rateChangeDate.setHours(3, 0, 0, 0); // GMT+3
+
     this.gainedMonthlyReward = 0;
     this.isReinvesting = true;
+    this.isRateChange = true;
   }
 
   // GET
@@ -40,6 +51,9 @@ class StakingInfo {
   }
   getRate() {
     return this.rate;
+  }
+  getRateChange() {
+    return this.rateChange;
   }
 
   getDurationInMonths() {
@@ -57,6 +71,9 @@ class StakingInfo {
   getIsReinvesting() {
     return this.isReinvesting;
   }
+  getIsRateChange() {
+    return this.isRateChange;
+  }
 
   // SET
   setInvestment(value) {
@@ -67,6 +84,9 @@ class StakingInfo {
   }
   setTotalGainedReward(value) {
     this.totalGainedReward = value;
+  }
+  setIsRateChange(bool) {
+    this.isRateChange = bool;
   }
 }
 module.exports = StakingInfo;
