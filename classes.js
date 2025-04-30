@@ -16,7 +16,7 @@ class StakingInfo {
     this.startDate = new Date();
     this.startDate.setFullYear(2025);
     this.startDate.setMonth(3);
-    this.startDate.setDate(15);
+    this.startDate.setDate(25);
     this.startDate.setHours(3, 0, 0, 0); // GMT+3
 
     this.durationInMonths = 24;
@@ -25,7 +25,7 @@ class StakingInfo {
     this.rewardDate = new Date(this.startDate);
     if (this.rewardDate.getDate() <= this.paymentDay) {
       this.rewardDate.setDate(this.paymentDay);
-    } else {
+    } else if (this.rewardDate.getDate() > this.paymentDay) {
       this.rewardDate.setMonth(this.rewardDate.getMonth() + 1);
       this.rewardDate.setDate(this.paymentDay);
     }
