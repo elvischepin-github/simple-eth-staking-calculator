@@ -19,27 +19,33 @@ csvFile.push(headers);
 
 // // // MAIN CORE IIFE FUNCTION
 (function funcManageData() {
-  // Initial first monthGainedReward
-  csi.setMonthGainedReward(
-    actualBy365(
-      1,
-      csi.durationInMonths,
-      csi.startDate,
-      csi.rewardDate,
-      csi.rateChangeDate,
-      csi.paymentDay,
-      csi.rate,
-      csi.rateChange,
-      csi.investment,
-      csi.isRateChange
-    )
-  );
-  csi.setTotalGainedReward(csi.monthGainedReward);
-
   // // ITERATIONS
   for (let i = 1; i <= csi.durationInMonths + 1; i++) {
-    // Setting last months day
-    if (i == csi.durationInMonths + 1) {
+    // If first month
+    if (i === 1) {
+      csi.setMonthGainedReward(
+        actualBy365(
+          i,
+          csi.durationInMonths,
+          csi.startDate,
+          csi.rewardDate,
+          csi.rateChangeDate,
+          csi.paymentDay,
+          csi.rate,
+          csi.rateChange,
+          csi.investment,
+          csi.isRateChange,
+          csi
+        )
+      );
+      csi.setTotalGainedReward(csi.monthGainedReward);
+    }
+
+    // Setting last months day, if start day is less or equal to than payment day
+    if (
+      i == csi.durationInMonths + 1 &&
+      csi.getPaymentDay() >= csi.startDate.getUTCDate()
+    ) {
       csi.rewardDate.setDate(csi.startDate.getUTCDate());
     }
 
@@ -57,7 +63,11 @@ csvFile.push(headers);
         Investment_Amount: csi.investment.toFixed(6),
         Current_Month_Reward_Amount: csi.getMonthGainedReward().toFixed(6),
         Total_Reward_Amount_To_Date: csi.getTotalGainedReward().toFixed(6),
-        Staking_Reward_Rate: `${csi.getRate().toFixed(2)}%`,
+        Staking_Reward_Rate: `${
+          csi.getIsChangeRateTransitionMonthCalculated()
+            ? csi.rateChange.toFixed(2)
+            : csi.getRate().toFixed(2)
+        }%`,
       },
     ];
     data.forEach((item) => {
@@ -81,22 +91,14 @@ csvFile.push(headers);
         csi.rate,
         csi.rateChange,
         csi.investment,
-        csi.isRateChange
+        csi.isRateChange,
+        csi
       )
     );
 
     csi.setTotalGainedReward(
       csi.getMonthGainedReward() + csi.getTotalGainedReward()
     );
-
-    // Checking if rateChange arrived
-    if (
-      csi.rewardDate.getUTCFullYear() >= csi.rateChangeDate.getUTCFullYear() &&
-      csi.rewardDate.getUTCMonth() >= csi.rateChangeDate.getUTCMonth() &&
-      csi.rewardDate.getUTCDate() >= csi.rateChangeDate.getUTCDate()
-    ) {
-      csi.setIsRateChange(true);
-    }
   }
 })();
 

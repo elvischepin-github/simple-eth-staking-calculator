@@ -5,8 +5,6 @@ const {
   compareAsc,
 } = require("date-fns");
 
-let isChangeRateMonthCalculated = false;
-
 function actualBy365(
   index,
   durationInMonthsArg,
@@ -17,153 +15,116 @@ function actualBy365(
   rateArg,
   rateChangeArg,
   investmentArg,
-  isRateChangeArg
+  isRateChangeArg,
+  instanceOfClass
 ) {
   let actualDays;
 
-  const daysInMonth = eachDayOfInterval({
-    start: startOfMonth(rewardDateArg),
-    end: endOfMonth(rewardDateArg),
+  // Dynamic shared last month
+  const lastMonth = new Date(rewardDateArg);
+  lastMonth.setMonth(lastMonth.getUTCMonth() - 1);
+
+  const lastDaysInMonth = eachDayOfInterval({
+    start: startOfMonth(lastMonth),
+    end: endOfMonth(lastMonth),
   }).map((day) => {
-    // Mapping to set whole month days to correct hours
     const newDay = new Date(day);
     newDay.setHours(3, 0, 0, 0); // GMT+3
     return newDay;
   });
 
-  // // TWO RATE CALCULATION
-  // If change rate date happens before reward date
-  const previousPaymentDate = new Date(
-    rewardDateArg.getFullYear(),
-    rewardDateArg.getMonth() - 1,
-    paymentDayArg
-  );
-
-  console.log("rewardDateArg", rewardDateArg);
-  console.log("previousPaymentDate", previousPaymentDate);
-
+  // RATE TRANSITION MONTH
+  // Checking if rateChange arrived (compareAsc returns 1 as True and -1 as False)
   if (
+    !instanceOfClass.getIsChangeRateTransitionMonthCalculated() &&
     isRateChangeArg &&
-    !isChangeRateMonthCalculated &&
-    compareAsc(rateChangeDateArg, previousPaymentDate) !== -1 &&
-    compareAsc(rateChangeDateArg, rewardDateArg) === -1
+    compareAsc(rewardDateArg, rateChangeDateArg) == 1
   ) {
-    {
-      const lastMonth = new Date(rewardDateArg);
-      lastMonth.setMonth(lastMonth.getUTCMonth() - 1);
+    let firstRate, secondRate, firstRateCalc, secondRateCalc, result;
 
-      const newDaysInMonth = eachDayOfInterval({
-        start: startOfMonth(lastMonth),
-        end: endOfMonth(lastMonth),
-      }).map((day) => {
-        const newDay = new Date(day);
-        newDay.setHours(3, 0, 0, 0); // GMT+3
-        return newDay;
-      });
-
-      const daysWithPreviousRate =
-        newDaysInMonth.length -
+    if (paymentDayArg >= rateChangeDateArg.getUTCDate()) {
+      firstRate =
+        lastDaysInMonth.length -
         paymentDayArg +
-        Number(rateChangeDateArg.getUTCDate()) -
-        1; // Excluding one day
+        rateChangeDateArg.getUTCDate() -
+        1;
+      firstRateCalc = () => {
+        return (firstRate / 365) * (rateArg / 100) * investmentArg;
+      };
 
-      const previousRateCalc =
-        (daysWithPreviousRate / 365) * (rateArg / 100) * investmentArg;
+      secondRate = paymentDayArg - rateChangeDateArg.getUTCDate();
+      secondRateCalc = () => {
+        return (secondRate / 365) * (rateChangeArg / 100) * investmentArg;
+      };
 
-      const remainingDaysWithChangedRate =
-        paymentDayArg - rateChangeDateArg.getUTCDate() + 1; // Including one day
+      result = firstRateCalc() + secondRateCalc();
 
-      const changedRateCalc =
-        (remainingDaysWithChangedRate / 365) *
-        (rateChangeArg / 100) *
-        investmentArg;
+      instanceOfClass.setIsChangeRateTransitionMonthCalculated(true);
+      return result;
+    } else if (paymentDayArg < rateChangeDateArg.getUTCDate()) {
+      firstRate = rateChangeDateArg.getUTCDate() - paymentDayArg;
 
-      isChangeRateMonthCalculated = true;
-      return previousRateCalc + changedRateCalc;
+      firstRateCalc = () => {
+        return (firstRate / 365) * (rateArg / 100) * investmentArg;
+      };
+
+      secondRate =
+        lastDaysInMonth.length -
+        rateChangeDateArg.getUTCDate() +
+        paymentDayArg -
+        1;
+      secondRateCalc = () => {
+        return (secondRate / 365) * (rateChangeArg / 100) * investmentArg;
+      };
+
+      result = firstRateCalc() + secondRateCalc();
+
+      instanceOfClass.setIsChangeRateTransitionMonthCalculated(true);
+      return result;
     }
   }
 
-  // If change rate date after reward date
-  if (
-    isRateChangeArg &&
-    !isChangeRateMonthCalculated &&
-    compareAsc(rateChangeDateArg, rewardDateArg) !== -1
-  ) {
-    const lastMonth = new Date(rewardDateArg);
-    lastMonth.setMonth(lastMonth.getUTCMonth());
-
-    const newDaysInMonth = eachDayOfInterval({
-      start: startOfMonth(lastMonth),
-      end: endOfMonth(lastMonth),
-    }).map((day) => {
-      const newDay = new Date(day);
-      newDay.setHours(3, 0, 0, 0); // GMT+3
-      return newDay;
-    });
-
-    // console.log(newDaysInMonth);
-    const daysWithPreviousRate = newDaysInMonth.length - paymentDayArg - 1;
-
-    const previousRateCalc =
-      (daysWithPreviousRate / 365) * (rateArg / 100) * investmentArg;
-
-    const remainingDaysWithChangedRate =
-      newDaysInMonth.length -
-      rateChangeDateArg.getUTCDate() +
-      1 +
-      paymentDayArg;
-
-    const changedRateCalc =
-      (remainingDaysWithChangedRate / 365) *
-      (rateChangeArg / 100) *
-      investmentArg;
-
-    isChangeRateMonthCalculated = true;
-    return previousRateCalc + changedRateCalc;
-  }
-
-  // Exiting if too many months
+  // EXIT
   if (index > durationInMonthsArg + 1) {
     return 0;
   }
 
-  // First month
-  if (index == 1) {
-    if (startDateArg.getDate() >= paymentDayArg) {
-      actualDays =
-        daysInMonth.length - Number(startDateArg.getDate()) + paymentDayArg;
+  // FIRST MONTH
+  if (index === 1) {
+    if (startDateArg.getUTCDate() <= paymentDayArg) {
+      // Reward date is in the same month
+
+      actualDays = paymentDayArg - startDateArg.getUTCDate() - 1;
     } else {
-      actualDays = paymentDayArg - Number(startDateArg.getDate());
+      // Reward date is moved to another month
+
+      actualDays =
+        lastDaysInMonth.length - startDateArg.getUTCDate() + paymentDayArg;
     }
   }
 
-  // In between months
+  // IN BETWEEN MONTHS
   if (index > 1 && index < durationInMonthsArg + 1) {
-    actualDays = paymentDayArg + (daysInMonth.length - paymentDayArg);
+    actualDays = lastDaysInMonth.length - 1;
   }
 
-  // Last month
+  // LAST MONTH
   if (index == durationInMonthsArg + 1) {
-    // Need to move one month backwards and get days
-    const lastMonth = new Date(rewardDateArg);
-    lastMonth.setMonth(lastMonth.getUTCMonth() - 1);
+    let lastDay = startDateArg.getUTCDate();
+    // Not overlapping to other period
+    if (paymentDayArg <= startDateArg.getUTCDate()) {
+      lastDay = paymentDayArg;
+    }
 
-    const newDaysInMonth = eachDayOfInterval({
-      start: startOfMonth(lastMonth),
-      end: endOfMonth(lastMonth),
-    }).map((day) => {
-      const newDay = new Date(day);
-      newDay.setHours(3, 0, 0, 0); // GMT+3
-      return newDay;
-    });
-
-    actualDays =
-      newDaysInMonth.length - paymentDayArg + Number(startDateArg.getDate());
+    actualDays = lastDaysInMonth.length - paymentDayArg + lastDay - 1; // Not including the last day
   }
 
   return (
     (actualDays / 365) *
-    ((isChangeRateMonthCalculated ? rateChangeArg : rateArg) / 100) *
+    ((instanceOfClass.getIsChangeRateTransitionMonthCalculated()
+      ? rateChangeArg
+      : rateArg) /
+      100) *
     investmentArg
   );
 }
