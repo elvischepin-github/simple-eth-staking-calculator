@@ -16,7 +16,7 @@ class StakingInfo {
     this.startDate = new Date();
     this.startDate.setFullYear(2025);
     this.startDate.setMonth(3);
-    this.startDate.setDate(25);
+    this.startDate.setDate(15);
     this.startDate.setHours(3, 0, 0, 0); // GMT+3
 
     this.durationInMonths = 24;
