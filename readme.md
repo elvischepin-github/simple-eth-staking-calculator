@@ -3,8 +3,6 @@
 > All calculations done with full precision values then displayed with six decimal values.
 > Rewards arrive up to the day before the payment day.
 
-> Calculation introduces rate change on specified date, rate transition month is calculated with two rates.
-
 > Local time is set to GMT+3
 
 ---
