@@ -2,6 +2,7 @@
 
 > All calculations done with full precision values then displayed with six decimal values.
 Rewards arrive up to the day before the payment day.
+> Local time is set to GMT+3
 
 ## Instructions
 
@@ -44,5 +45,7 @@ Release **Bonus Task 2_** program generates profit from input, includes rate cha
 - Open project folder in (macOS terminal or Windows Console)
 - Run in console `npm install`.
 - Lastly, to run program run `node main.js`.
+- Enter inputs into the program based on prompts.
+- In case you want to exit program push `CTRL+C` combination.
 
 Generated file can be opened on (macOS Numbers or Windows Excel).
