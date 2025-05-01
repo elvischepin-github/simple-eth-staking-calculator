@@ -14,89 +14,113 @@ class StakingInfo {
 
   #isChangeRateTransitionMonthCalculated;
 
-  constructor() {
-    this.investment = 25;
-    this.rate = 10;
-    this.rateChange = 8;
+  constructor(
+    startDateArg = null,
+    durationInMonthsArg = 24,
+    investmentArg = 25,
+    rateArg = 10,
+    paymentDayArg = 23,
+    isReinvestingArg = true,
+    isRateChangeArg = true,
+    rateChangeDateArg = null,
+    rateChangeArg = 8
+  ) {
+    this.#investment = investmentArg;
+    this.#rate = rateArg;
+    this.#rateChange = rateChangeArg;
 
-    this.startDate = new Date();
-    this.startDate.setFullYear(2025);
-    this.startDate.setMonth(3);
-    this.startDate.setDate(15);
-    this.startDate.setHours(3, 0, 0, 0); // GMT+3
+    this.#startDate =
+      startDateArg === null ? new Date(2025, 3, 15) : new Date(startDateArg);
+    this.#startDate.setHours(3, 0, 0, 0); // GMT+3
 
-    this.durationInMonths = 24;
-    this.paymentDay = 23;
+    this.#durationInMonths = durationInMonthsArg;
+    this.#paymentDay = paymentDayArg;
 
-    this.rewardDate = new Date(this.startDate);
-    if (this.rewardDate.getDate() <= this.paymentDay) {
-      this.rewardDate.setDate(this.paymentDay);
+    this.#rewardDate =
+      this.#rewardDate == null
+        ? new Date(this.#startDate)
+        : new Date(2026, 3, 15);
+    if (this.#rewardDate.getDate() <= this.#paymentDay) {
+      this.#rewardDate.setDate(this.#paymentDay);
     } else if (this.rewardDate.getDate() > this.paymentDay) {
-      this.rewardDate.setMonth(this.rewardDate.getMonth() + 1);
-      this.rewardDate.setDate(this.paymentDay);
+      this.#rewardDate.setMonth(this.#rewardDate.getMonth() + 1);
+      this.#rewardDate.setDate(this.#paymentDay);
     }
 
-    this.rateChangeDate = new Date();
-    this.rateChangeDate.setFullYear(2026);
-    this.rateChangeDate.setMonth(3);
-    this.rateChangeDate.setDate(15);
-    this.rateChangeDate.setHours(3, 0, 0, 0); // GMT+3
+    this.#rateChangeDate =
+      rateChangeDateArg === null
+        ? new Date(2026, 3, 15)
+        : new Date(rateChangeDateArg);
+    this.#rateChangeDate.setHours(3, 0, 0, 0); // GMT+3
 
-    this.gainedMonthlyReward = 0;
-    this.isReinvesting = true;
-    this.isRateChange = true;
+    this.#monthGainedReward = 0;
+    this.#totalGainedReward = 0;
+    this.#isReinvesting = isReinvestingArg;
+    this.#isRateChange = isRateChangeArg;
 
-    this.isChangeRateTransitionMonthCalculated = false;
+    this.#isChangeRateTransitionMonthCalculated = false;
   }
 
-  // GET
+  // GETTERS
   getInvestment() {
-    return this.investment;
+    return this.#investment;
   }
   getRate() {
-    return this.rate;
+    return this.#rate;
   }
   getRateChange() {
-    return this.rateChange;
+    return this.#rateChange;
   }
-
   getDurationInMonths() {
-    return this.durationInMonths;
+    return this.#durationInMonths;
   }
   getPaymentDay() {
-    return this.paymentDay;
+    return this.#paymentDay;
   }
   getMonthGainedReward() {
-    return this.monthGainedReward;
+    return this.#monthGainedReward;
   }
   getTotalGainedReward() {
-    return this.totalGainedReward;
+    return this.#totalGainedReward;
   }
   getIsReinvesting() {
-    return this.isReinvesting;
+    return this.#isReinvesting;
   }
   getIsRateChange() {
-    return this.isRateChange;
+    return this.#isRateChange;
   }
   getIsChangeRateTransitionMonthCalculated() {
-    return this.isChangeRateTransitionMonthCalculated;
+    return this.#isChangeRateTransitionMonthCalculated;
+  }
+  get startDate() {
+    return this.#startDate;
+  }
+  get rewardDate() {
+    return this.#rewardDate;
+  }
+  get rateChangeDate() {
+    return this.#rateChangeDate;
   }
 
-  // SET
+  // SETTERS
   setInvestment(value) {
-    this.investment = value;
+    this.#investment = value;
   }
   setMonthGainedReward(value) {
-    this.monthGainedReward = value;
+    this.#monthGainedReward = value;
+  }
+  setDurationInMonths(value) {
+    this.#durationInMonths = value;
   }
   setTotalGainedReward(value) {
-    this.totalGainedReward = value;
+    this.#totalGainedReward = value;
   }
   setIsRateChange(bool) {
-    this.isRateChange = bool;
+    this.#isRateChange = bool;
   }
   setIsChangeRateTransitionMonthCalculated(bool) {
-    this.isChangeRateTransitionMonthCalculated = bool;
+    this.#isChangeRateTransitionMonthCalculated = bool;
   }
 }
+
 module.exports = StakingInfo;
