@@ -255,12 +255,13 @@ function funcManageData(csi) {
 
   // ITERATIONS
   for (let i = 1; i <= csi.getDurationInMonths(); i++) {
-    console.log("investment:", csi.getInvestment());
-    console.log("monthGainedReward:", csi.getMonthGainedReward());
-    console.log("rateChangeDate:", csi.rateChangeDate);
-    console.log("ra:", csi.getTotalGainedReward());
-    console.log("rateChange:", csi.getRateChange());
-    console.log("rate:", csi.getRate());
+    // Debugging loggers
+    // console.log("investment:", csi.getInvestment());
+    // console.log("monthGainedReward:", csi.getMonthGainedReward());
+    // console.log("rateChangeDate:", csi.rateChangeDate);
+    // console.log("totalGainedReward:", csi.getTotalGainedReward());
+    // console.log("rateChange:", csi.getRateChange());
+    // console.log("rate:", csi.getRate());
 
     // If first month
     if (i === 1) {
