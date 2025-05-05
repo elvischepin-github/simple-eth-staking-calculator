@@ -94,7 +94,7 @@ function actualBy365(
     if (startDateArg.getUTCDate() <= paymentDayArg) {
       // Reward date is in the same month
 
-      actualDays = paymentDayArg - startDateArg.getUTCDate() - 1;
+      actualDays = paymentDayArg - startDateArg.getUTCDate();
     } else {
       // Reward date is moved to another month
 
@@ -105,7 +105,7 @@ function actualBy365(
 
   // IN BETWEEN MONTHS
   if (index > 1 && index < durationInMonthsArg + 1) {
-    actualDays = lastDaysInMonth.length - 1;
+    actualDays = lastDaysInMonth.length;
   }
 
   // LAST MONTH
