@@ -47,6 +47,14 @@ After download and install, pull project into folder, **_Master_** branch contai
 > Branch ([_3_bonus_task_2_](https://github.com/elvischepin-github/progress-entry-task-2025/tree/2_bonus_task_1)) ✅
 > Release **_Bonus Task 2_** program generates profit from input, includes rate change as well, this program comes without _output.csv_ (must be generated with input).
 
+- Start date 2020-11-10
+- Investment 10.000000 ETH
+- Duration 2 years (24 months)
+- Reward day on 15th of the month
+- Yearly reward rate 7%
+- Customer is reinvesting
+- No rate change was applied nor the rate change day
+
 ### How To Start
 
 - Open project folder in (macOS - Terminal or Windows - Console)
