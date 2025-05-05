@@ -44,10 +44,7 @@ function actualBy365(
 
     if (paymentDayArg >= rateChangeDateArg.getUTCDate()) {
       firstRate =
-        lastDaysInMonth.length -
-        paymentDayArg +
-        rateChangeDateArg.getUTCDate() -
-        1;
+        lastDaysInMonth.length - paymentDayArg + rateChangeDateArg.getUTCDate();
       firstRateCalc = () => {
         return (firstRate / 365) * (rateArg / 100) * investmentArg;
       };
@@ -69,10 +66,7 @@ function actualBy365(
       };
 
       secondRate =
-        lastDaysInMonth.length -
-        rateChangeDateArg.getUTCDate() +
-        paymentDayArg -
-        1;
+        lastDaysInMonth.length - rateChangeDateArg.getUTCDate() + paymentDayArg;
       secondRateCalc = () => {
         return (secondRate / 365) * (rateChangeArg / 100) * investmentArg;
       };
@@ -94,7 +88,7 @@ function actualBy365(
     if (startDateArg.getUTCDate() <= paymentDayArg) {
       // Reward date is in the same month
 
-      actualDays = paymentDayArg - startDateArg.getUTCDate() - 1;
+      actualDays = paymentDayArg - startDateArg.getUTCDate();
     } else {
       // Reward date is moved to another month
 
@@ -105,7 +99,7 @@ function actualBy365(
 
   // IN BETWEEN MONTHS
   if (index > 1 && index < durationInMonthsArg + 1) {
-    actualDays = lastDaysInMonth.length - 1;
+    actualDays = lastDaysInMonth.length;
   }
 
   // LAST MONTH
