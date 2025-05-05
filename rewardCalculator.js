@@ -44,10 +44,7 @@ function actualBy365(
 
     if (paymentDayArg >= rateChangeDateArg.getUTCDate()) {
       firstRate =
-        lastDaysInMonth.length -
-        paymentDayArg +
-        rateChangeDateArg.getUTCDate() -
-        1;
+        lastDaysInMonth.length - paymentDayArg + rateChangeDateArg.getUTCDate();
       firstRateCalc = () => {
         return (firstRate / 365) * (rateArg / 100) * investmentArg;
       };
@@ -69,10 +66,7 @@ function actualBy365(
       };
 
       secondRate =
-        lastDaysInMonth.length -
-        rateChangeDateArg.getUTCDate() +
-        paymentDayArg -
-        1;
+        lastDaysInMonth.length - rateChangeDateArg.getUTCDate() + paymentDayArg;
       secondRateCalc = () => {
         return (secondRate / 365) * (rateChangeArg / 100) * investmentArg;
       };
