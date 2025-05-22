@@ -1,5 +1,7 @@
 # Simplified Ethereum Staking Profit Calculator
 
+> Calculated with Actual/365 formula.
+
 > All calculations done with full precision values then displayed with six decimal values.
 > Rewards arrive up to the day before the payment day.
 
